@@ -15,12 +15,16 @@ require(forcats)
 OldData <-read.csv(file="covid91.csv",header=TRUE)
 #recode to remove the annoying "X" from the dataframe
 FinalData <- OldData %>% mutate(infected = recode(infected, aids = "covid", none = "OK" )) %>% select(-one_of("X"))
-FinalData$treatment <- as.factor(FinalData$treatment)
-FinalData$sex <- as.factor(FinalData$sex)
-FinalData$infected <- as.factor(FinalData$infected)
-FinalData$LGBTQ <- as.factor(FinalData$LGBTQ)
-FinalData$DrugUser <- as.factor(FinalData$DrugUser)
+FinalData <- FinalData %>%
+mutate(across(where(is.character), as.factor))
+FinalData$treatment <- relevel(FinalData$treatment,ref="placebo")    
+#FinalData$infected <- relevel(FinalData$infected,ref"OK")
+guy = filter(FinalData, sex =="guy")
+gal = filter(FinalData, sex =="gal")
+gay = filter(FinalData, LGBTQ =="gay")
+DrugUser = filter(FinalData, DrugUser =="yes")
 ```
+
 
 # Introduction
 
@@ -28,12 +32,166 @@ A new  preventative vaccine (covid19) is under test in clinical trials. Given th
 
 # Guys "sex = guy"
 
+## Barplot
+
+```{r}
+dd2 <- guy %>% group_by(infected,treatment) %>% summarize(count=n()) %>% mutate(prcnt=count/sum(count))
+
+# the group_by followed by summarize(count=n())
+
+basicC <- ggplot(dd2,aes(x=infected,y=count,fill=treatment))
+basicC + geom_bar(stat="identity",position = "dodge")
+
+# Now the percentage plot
+
+basicCC <- ggplot(dd2,aes(x=infected,y=prcnt*100,fill=treatment))
+basicCC + geom_bar(stat="identity", position = "dodge")
+```
+
+The plot above represents the population of males (guys) and the relationship to the infection of COVID-19 by either taking a placebo or the vaccine.
+
+It shows that 58% of males that took the vaccine contracted COVID-19, while only 42% of males who took the placebo contracted COVID-19. Due to the data showing that a large percentage of vaccinated males contracted COVID-19 it shows that the vaccine is ineffective towards the virus. 
+
+On the first plot the x-axis represents the infected or not infected by COVID-19 while the y-axis represents the count, number, of people who that got COVID-19 or not. In the second plot the two bars represent the percent of people who contracted COVID-19. The x-axis represents whether an individual contracted COVID-19 or not while the y-axis represents the percentage of people who contracted the virus after taking the placebo or the vaccine. 
+
+### Numerical results 
+```{r}
+table1 <- xtabs(~infected + treatment, data=guy)
+rowPerc(table1)
+colPerc(table1)
+```
+
+The numerical results above show the percentage of males that contracted COVID-19 after taking the placebo or the vaccine. Among the males who participated in the study 58% of males who were vaccinated contracted COVID-19 while 41.8% of males who took the placebo contracted COVID-19. The results above show that the vaccine is unfortunately ineffective against the virus among males and would not be recommended due to these statistics. The odds of contracting the virus is 3:2 while taking the vaccine and shows that men who took the vaccine are 1.5 times more likely to contract the virus than those who took the placebo. 
+
+###Inferential 
+```{r}
+chisq.test(table1)
+chisqtestGC(table1)
+guysfish <- fisher.test(table1)
+guysfish
+```
+
+The p-value above is 0.0006, an extremely small number, meaning that the percentage of error among the results is highly unlikely. The odd ratio of 0.678 shows that men who received the vaccine were 1.5 times more likely to contract COVID-19 than those who took the placebo. 
+
+The null hypothesis predicted that the contraction of the virus is independent from sex. Due to the statistics it shows that the contraction of the virus does play a role in the sexual orientation of individuals.
+
+```{r}
+effect <- guysfish$p.value/(guysfish$p.value +1)
+effectivenessguy = guysfish$estimate/(guysfish$estimate +1)*100
+print(effectivenessguy)
+```
+
+```{r}
+low=(guysfish$conf.int[1]/(guysfish$conf.int[1] +1))*100
+hi=(guysfish$conf.int[2]/(guysfish$conf.int[2] +1))*100
+options(digits=2)
+```
+
+## Effectiveness Confidence Interval 'r low' and 'r high'
+ Because the effectiveness is below 50% we can conclude that the vaccine is ineffective in protecting males against contracting COVID-19.
 
 # Gal "sex = gal"
+
+## Barplot
+
+```{r}
+dd2 <- gal %>% group_by(infected,treatment) %>% summarize(count=n()) %>% mutate(prcnt=count/sum(count))
+
+# the group_by followed by summarize(count=n())
+
+basicC <- ggplot(dd2,aes(x=infected,y=count,fill=treatment))
+basicC + geom_bar(stat="identity",position = "dodge")
+
+# Now the percentage plot
+
+basicCC <- ggplot(dd2,aes(x=infected,y=prcnt*100,fill=treatment))
+basicCC + geom_bar(stat="identity", position = "dodge")
+```
+
+The plot above represents the population of females (gals) and the relationship to the infection of COVID-19 by either taking a placebo or the vaccine.
+
+It shows that 35% of females that took the vaccine contracted COVID-19, while 65% of females who took the placebo contracted COVID-19. Due to the data showing that a large percentage of females who took the placebo contracted COVID-19 compared to the small percentage of vaccinated females who contracted COVID-19 the data shows that the vaccine is effective in against the virus among females. The data above also shows that those who took the placebo were twice as likely to contract COVID compared to those who were vaccinated. 
+
+On the first plot the x-axis represents the infected or not infected by COVID-19 while the y-axis represents the count, number, of people who that got COVID-19 or not. In the second plot the two bars represent the percent of people who contracted COVID-19. The x-axis represents whether an individual contracted COVID-19 or not while the y-axis represents the percentage of people who contracted the virus after taking the placebo or the vaccine. 
+
+### Numerical results 
+```{r}
+table1 <- xtabs(~infected + treatment, data=gal)
+rowPerc(table1)
+colPerc(table1)
+```
+
+The numerical results above show the percentage of females that contracted COVID-19 after taking the placebo or the vaccine. Among the females who participated in the study 33% of females who were vaccinated contracted COVID-19 while 67% of females who took the placebo contracted COVID-19. The results above show that the vaccine is effective against the virus among females and would be recommended due to these statistics. The odds of contracting the virus is 1.5 times as likely if a female is not vaccinated. 
+
+###Inferential 
+```{r}
+chisq.test(table1)
+chisqtestGC(table1)
+galsfish <- fisher.test(table1)
+galsfish
+```
+
+The p-value above is 2.2e-16, an extremely small number, meaning that the percentage of error among the results is highly unlikely. The odd ratio of 2.045 shows that women who received the vaccine were 1.5 times more likely to contract COVID-19 than those who took the placebo. 
+
+The null hypothesis predicted that the contraction of the virus is independent from sex. Due to the statistics it shows that the contraction of the virus does play a role in the sexual orientation of individuals. Therefore we reject the null hypothesis. 
+
+```{r}
+effect <- galsfish$p.value/(galsfish$p.value +1)
+effectivenessgal = galsfish$estimate/(galsfish$estimate +1)*100
+print(effectivenessgal)
+```
+
+```{r}
+low=(galsfish$conf.int[1]/(galsfish$conf.int[1] +1))*100
+hi=(galsfish$conf.int[2]/(galsfish$conf.int[2] +1))*100
+options(digits=2)
+```
+
+## Effectiveness Confidence Interval 'r low' and 'r high'
+ Because the effectiveness is above 60% we can conclude that the vaccine is effective in protecting females against contracting COVID-19. The odd ratio for this data is 67.2 which means that the vaccine is highly effective for women. 
 
 
 # Sexual Orientation ("LGBTQ = gay")
 
+## Barplot
+```{r}
+dd2 <- gay %>% group_by(infected,treatment) %>% summarize(count=n()) %>% mutate(prcnt=count/sum(count))
+
+# the group_by followed by summarize(count=n())
+
+basicC <- ggplot(dd2,aes(x=infected,y=count,fill=treatment))
+basicC + geom_bar(stat="identity",position = "dodge")
+
+# Now the percentage plot
+
+basicCC <- ggplot(dd2,aes(x=infected,y=prcnt*100,fill=treatment))
+basicCC + geom_bar(stat="identity", position = "dodge")
+```
+The plot above represents the population of LGBTQ (gays) and the relationship to the infection of COVID-19 by either taking a placebo or the vaccine.
+
+It shows that 70% of gay individuals that took the vaccine contracted COVID-19, while 28% of gay individuals who took the placebo contracted COVID-19. Due to the data showing that a large percentage of gay individuals who took the vaccine contracted COVID-19 compared to the small percentage of individuals who took the placebo who contracted COVID-19 the data shows that the vaccine is ineffective against the virus among gays. The data above also shows that those who took the vaccine were almost three times as likely to contract COVID compared to those who took the placebo. 
+
+On the first plot the x-axis represents the infected or not infected by COVID-19 while the y-axis represents the count, number, of people who that got COVID-19 or not. In the second plot the two bars represent the percent of people who contracted COVID-19. The x-axis represents whether an individual contracted COVID-19 or not while the y-axis represents the percentage of people who contracted the virus after taking the placebo or the vaccine. 
+
+### Numerical results 
+```{r}
+table1 <- xtabs(~infected + treatment, data=gay)
+rowPerc(table1)
+colPerc(table1)
+```
+
+The numerical results above show the percentage of gay individuals that contracted COVID-19 after taking the placebo or the vaccine. Among the gay individuals who participated in the study 71%% of gays who were vaccinated contracted COVID-19 while 29% of gays who took the placebo contracted COVID-19. The results above show that the vaccine is ineffective against the virus among gays and would not be recommended due to these statistics. 
+
+###Inferential 
+```{r}
+chisq.test(table1)
+chisqtestGC(table1)
+gaysfish <- fisher.test(table1)
+gaysfish
+```
+
+The p-value above is 6e-06, an extremely small number, meaning that the percentage of error among the results is highly unlikely. The odd ratio of 0.4 shows that gay individuals who received the vaccine were more likely to contract the virus. 
+The null hypothesis predicted that the contraction of the virus is independent from sex. Due to the statistics it shows that the contraction of the virus does play a role in the sexual orientation of individuals. Therefore we reject the null hypothesis. 
 
 # Drug Users "Drug user = yes"
 
