@@ -73,7 +73,7 @@ guysfish
 
 The p-value above is 0.0006, an extremely small number, meaning that the percentage of error among the results is highly unlikely. The odd ratio of 0.678 shows that men who received the vaccine were 1.5 times more likely to contract COVID-19 than those who took the placebo. 
 
-The null hypothesis predicted that the contraction of the virus is independent from sex. Due to the statistics it shows that the contraction of the virus does play a role in the sexual orientation of individuals.
+The null hypothesis predicted that the contraction of the virus is independent from sex. Due to the statistics it shows that the contraction of the virus does play a role in the sexual orientation of individuals. The alternate hypothesis is that there is a correlation between sex and contracting the virus. 
 
 ```{r}
 effect <- guysfish$p.value/(guysfish$p.value +1)
@@ -133,7 +133,7 @@ galsfish
 
 The p-value above is 2.2e-16, an extremely small number, meaning that the percentage of error among the results is highly unlikely. The odd ratio of 2.045 shows that women who received the vaccine were 1.5 times more likely to contract COVID-19 than those who took the placebo. 
 
-The null hypothesis predicted that the contraction of the virus is independent from sex. Due to the statistics it shows that the contraction of the virus does play a role in the sexual orientation of individuals. Therefore we reject the null hypothesis. 
+The null hypothesis predicted that the contraction of the virus is independent from sex. Due to the statistics it shows that the contraction of the virus does play a role in the sexual orientation of individuals. The alternate hypothesis is that there is a correlation between sex and contracting the virus. Therefore we reject the null hypothesis. 
 
 ```{r}
 effect <- galsfish$p.value/(galsfish$p.value +1)
@@ -190,8 +190,8 @@ gaysfish <- fisher.test(table1)
 gaysfish
 ```
 
-The p-value above is 6e-06, an extremely small number, meaning that the percentage of error among the results is highly unlikely. The odd ratio of 0.4 shows that gay individuals who received the vaccine were more likely to contract the virus. 
-The null hypothesis predicted that the contraction of the virus is independent from sex. Due to the statistics it shows that the contraction of the virus does play a role in the sexual orientation of individuals.
+The p-value above is 6e-06, an extremely small number, meaning that the percentage of error among the results is highly unlikely. The odd ratio of 0.4 shows that gay individuals who took the vaccine were 2.5 times more likely to contract the virus. 
+The null hypothesis predicted that the contraction of the virus is independent from sex. Due to the statistics it shows that the contraction of the virus does play a role in the sexual orientation of individuals.Therefore we reject the null hypothesis and are in favor of the alternative. 
 
 ```{r}
 effect <- gaysfish$p.value/(gaysfish$p.value +1)
@@ -265,4 +265,8 @@ options(digits=2)
 
 ## Effectiveness Confidence Interval 'r low' and 'r high'
  Because the effectiveness is above 60% we can conclude that the vaccine is effective in protecting drug users against contracting COVID-19. The odd ratio for this data is 65 which means that the vaccine is effective for drug users. 
+
+# Conclusion
+
+After conducting multiple test to provide statistical evidence of whether the vaccine was effective or not we concluded the vaccine was not effective in protecting males against contracting the virus. We then concluded that the COVID-19 vaccine was effective in protecting females against contracting the virus. After concluding that we found out that the vaccine was ineffective against protecting gay individuals against contracting the virus. We also concluded that the vaccine was effective in protecting drug users against contracting COVID-19. Therefore we recommend to take the vaccine if an individual is female or a drug user and do not recommend taking the vaccine for individuals men or gay individuals. 
 
