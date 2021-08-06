@@ -191,10 +191,78 @@ gaysfish
 ```
 
 The p-value above is 6e-06, an extremely small number, meaning that the percentage of error among the results is highly unlikely. The odd ratio of 0.4 shows that gay individuals who received the vaccine were more likely to contract the virus. 
-The null hypothesis predicted that the contraction of the virus is independent from sex. Due to the statistics it shows that the contraction of the virus does play a role in the sexual orientation of individuals. Therefore we reject the null hypothesis. 
+The null hypothesis predicted that the contraction of the virus is independent from sex. Due to the statistics it shows that the contraction of the virus does play a role in the sexual orientation of individuals.
+
+```{r}
+effect <- gaysfish$p.value/(gaysfish$p.value +1)
+effectivenessgay = gaysfish$estimate/(gaysfish$estimate +1)*100
+print(effectivenessgay)
+```
+
+```{r}
+low=(gaysfish$conf.int[1]/(gaysfish$conf.int[1] +1))*100
+hi=(gaysfish$conf.int[2]/(gaysfish$conf.int[2] +1))*100
+options(digits=2)
+```
+
+## Effectiveness Confidence Interval 'r low' and 'r high'
+ Because the effectiveness is below 50% we can conclude that the vaccine is ineffective in protecting gays against contracting COVID-19. The odd ratio for this data is 29 which means that the vaccine is ineffective for gay individuals. 
 
 # Drug Users "Drug user = yes"
 
+## Barplot
+```{r}
+dd2 <- DrugUser %>% group_by(infected,treatment) %>% summarize(count=n()) %>% mutate(prcnt=count/sum(count))
 
+# the group_by followed by summarize(count=n())
 
+basicC <- ggplot(dd2,aes(x=infected,y=count,fill=treatment))
+basicC + geom_bar(stat="identity",position = "dodge")
+
+# Now the percentage plot
+
+basicCC <- ggplot(dd2,aes(x=infected,y=prcnt*100,fill=treatment))
+basicCC + geom_bar(stat="identity", position = "dodge")
+```
+
+The plot above represents the population of drug users and the relationship to the infection of COVID-19 by either taking a placebo or the vaccine.
+
+It shows that 34% of drug users who that took the vaccine contracted COVID-19, while 65% of drug users who took the placebo contracted COVID-19. Due to the data showing that a small percentage of drug users who took the vaccine contracted COVID-19 compared to the large percentage of individuals who took the placebo who contracted COVID-19 the data shows that the vaccine is effective against the virus for drug users. The data above also shows that those who took the placebo were almost two times as likely to contract COVID compared to those who took the vaccine. 
+
+On the first plot the x-axis represents the infected or not infected by COVID-19 while the y-axis represents the count, number, of people who that got COVID-19 or not. In the second plot the two bars represent the percent of people who contracted COVID-19. The x-axis represents whether an individual contracted COVID-19 or not while the y-axis represents the percentage of people who contracted the virus after taking the placebo or the vaccine.
+
+### Numerical results 
+```{r}
+table1 <- xtabs(~infected + treatment, data=DrugUser)
+rowPerc(table1)
+colPerc(table1)
+```
+
+The numerical results above show the percentage of drug users that contracted COVID-19 after taking the placebo or the vaccine. Among the drug users who participated in the study 33% of drug users who were vaccinated contracted COVID-19 while 67% of drug users who took the placebo contracted COVID-19. The results above show that the vaccine is effective against the virus for drug users and would be recommended due to these statistics. 
+
+###Inferential 
+```{r}
+chisq.test(table1)
+chisqtestGC(table1)
+DrugUsersfish <- fisher.test(table1)
+DrugUsersfish
+```
+
+The p-value above is 0.002, an small number, meaning that the percentage of error among the results is highly unlikely. The odd ratio of 1.8 shows that drug users who received the vaccine were less likely to contract the virus. 
+The null hypothesis predicted that the contraction of the virus is independent from whether a drug user took the vaccine or the placebo.
+
+```{r}
+effect <- DrugUsersfish$p.value/(DrugUsersfish$p.value +1)
+effectivenessDrugUser = DrugUsersfish$estimate/(DrugUsersfish$estimate +1)*100
+print(effectivenessDrugUser)
+```
+
+```{r}
+low=(DrugUsersfish$conf.int[1]/(DrugUsersfish$conf.int[1] +1))*100
+hi=(DrugUsersfish$conf.int[2]/(DrugUsersfish$conf.int[2] +1))*100
+options(digits=2)
+```
+
+## Effectiveness Confidence Interval 'r low' and 'r high'
+ Because the effectiveness is above 60% we can conclude that the vaccine is effective in protecting drug users against contracting COVID-19. The odd ratio for this data is 65 which means that the vaccine is effective for drug users. 
 
